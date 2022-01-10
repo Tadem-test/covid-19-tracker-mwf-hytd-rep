@@ -6,8 +6,7 @@ function getStatistikData(countrydata) {
     const cases = {};
     const deaths = {};
     const statData = {};
-    const test = "Hallo Emre";
-  
+   
     for (var index = data.length - 1; index > 0; index--) {
       const selectedDate = moment.unix(data[index].Date_reported).format('MM/DD/YY');
       const casesValue = data[index].New_cases;

@@ -3,7 +3,7 @@ import { AppBar, Box, IconButton, Toolbar, Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import CountrySelector from "../CountrySelector/CountrySelector";
 
-export default function Header() {
+export default function Header({selectedCountry, handleChangeCountry, countries}) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -20,7 +20,7 @@ export default function Header() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Covid-19 Tracker Moderne Web Frameworks
           </Typography>
-          <CountrySelector />
+          <CountrySelector countries={countries} selectedCountry={selectedCountry} handleChangeCountry={handleChangeCountry} />
         </Toolbar>
       </AppBar>
       <Toolbar />
