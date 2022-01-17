@@ -19,14 +19,14 @@ export default function Content({countryData}) {
       <InfoBox
         onClick={(e) => handleClick("cases")}
         title="Cases"
-        cases={prettyPrintStat(countryData.New_cases)}
-        total={prettyPrintStat(countryData.Cumulative_cases)}
+        cases={prettyPrintStat(countryData.NewConfirmed)}
+        total={prettyPrintStat(countryData.TotalConfirmed)}
       />
       <InfoBox
         onClick={(e) => handleClick("deaths")}
         title="Deaths"
-        cases={prettyPrintStat(countryData.New_deaths)}
-        total={prettyPrintStat(countryData.Cumulative_deaths)}
+        cases={prettyPrintStat(countryData.NewDeaths)}
+        total={prettyPrintStat(countryData.TotalDeaths)}
       />
     </div>
   );

@@ -17,6 +17,7 @@ export default function Layout(props) {
   const [countrylistAPI1, setCountrylistAPI1] = useState([]);
   const [countrylistAPI2, setCountrylistAPI2] = useState([]);
   const [countriesData, setCountriesData] = useState([]);
+  const [countryData, setCountryData] = useState({});
 
   useEffect(() => {
     axios.get(`${BASE_URL_API_1}/countries`).then((response) => {
@@ -61,18 +62,19 @@ export default function Layout(props) {
     }
   };
 
-  const getInfoBoxData = () => {
-    if (selectedCountry === "Global") {
+  const getInfoBoxData = (value) => {
+    if (value === "Global") {
+      return countriesData.Global;
     } else {
     const dataArr = countriesData.Countries;
     const data = dataArr.filter((country) => country.Slug ===selectedCountrySlug);
-    return data;
+    return data[0];
     }
   };
 
   const handleChangeCountry = (event) => {
     setSelectedCountry(event.target.value);
-    console.log(event.target.value);
+    setCountryData(getInfoBoxData(event.target.value));
     getSelectedCountryData(
       event.target.value,
       "confirmed",
@@ -88,7 +90,7 @@ export default function Layout(props) {
         selectedCountry={selectedCountry}
         handleChangeCountry={handleChangeCountry}
       />
-      <Content countryData={getInfoBoxData()} />
+      <Content countryData={countryData} />
     </>
   );
 }
