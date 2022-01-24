@@ -1,20 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import InfoBox from "../InfoBox/InfoBox";
-import axios from "axios";
 import { prettyPrintStat } from "../Util/Util";
 
-export default function Content({countryData}) {
+export default function Content({selectedCountry, getInfoBoxData}) {
+    const [data,setData] = useState();
     const [casesType, setCasesType] = useState("cases");
 
     useEffect(() => {
-        console.log(countryData);
-    },[countryData])
+      setData(getInfoBoxData(selectedCountry));
+    },[])
 
       const handleClick = (type) => {
         setCasesType(type);
       }
 
-  return (
+  return(
+    <div>
+      <p>
+      ${JSON.stringify(data)}
+      </p>
+    </div>
+  )
+  /*return (
     <div>
       <InfoBox
         onClick={(e) => handleClick("cases")}
@@ -29,5 +36,5 @@ export default function Content({countryData}) {
         total={prettyPrintStat(countryData.TotalDeaths)}
       />
     </div>
-  );
+  );*/
 }

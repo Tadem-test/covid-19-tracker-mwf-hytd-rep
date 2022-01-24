@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { AppBar, Box, IconButton, Toolbar, Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import CountrySelector from "../CountrySelector/CountrySelector";
 
 export default function Header({selectedCountry, handleChangeCountry, countries}) {
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">

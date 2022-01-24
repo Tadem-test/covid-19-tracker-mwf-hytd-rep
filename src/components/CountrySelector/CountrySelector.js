@@ -3,7 +3,6 @@ import { Box, MenuItem, Select } from "@mui/material";
 import uuid from "react-uuid";
 
 export default function CountrySelector({selectedCountry, handleChangeCountry, countries}) {
-
   return (
     <Box sx={{ minWidth: 120 }}>
       <Select

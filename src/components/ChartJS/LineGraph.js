@@ -1,23 +1,44 @@
 import React, { useState, useEffect } from "react";
-import { Line } from "react-chartjs-2";
 import numeral from "numeral";
+import axios from "axios";
+import moment from "moment";
 
-function getStatistikData(countrydata) {
-    const cases = {};
-    const deaths = {};
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js'
+import { Chart } from 'react-chartjs-2'
+
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+)
+
+const BASE_URL_API_2 = "https://api.covid19api.com";
+
+function getStatisticData(countrydata) {
     const statData = {};
-   
-    for (var index = data.length - 1; index > 0; index--) {
-      const selectedDate = moment.unix(data[index].Date_reported).format('MM/DD/YY');
-      const casesValue = data[index].New_cases;
-      const deathsValue = data[index].New_deaths;
-      cases[selectedDate] = casesValue;
-      deaths[selectedDate] = deathsValue;
+    for (var index = 0; index < countrydata.length; index++) {
+        const date = countrydata[index].Date;
+        const utcStart = new moment(date, "YYYY-MM-DDTHH:mm:ssZ").utc();
+        const selectedDate = moment.unix(utcStart).format('MM/DD/YY');
+        //const splited = date.split('T');
+        //const selectedDate = splited[0];
+      const casesValue = countrydata[index].Cases;
+      statData[selectedDate] = casesValue;
     }
-  
-    statData["cases"] = cases;
-    statData["deaths"] = deaths;
-  
+    console.log(statData);
     return statData;
   }
 
@@ -65,40 +86,51 @@ const options = {
     ],
   },
 };
-const buildChartData = (data, casesType) => {
+
+const buildChartData = (data) => {
   let chartData = [];
-  for (let date in data.cases) {
+  for (let date in data) {
       let newDataPoint = {
         x: date,
-        y: data[casesType][date],
+        y: data[date],
       };
       chartData.push(newDataPoint);
   }
+  console.log(chartData);
   return chartData;
 };
 
-function LineGraph(countrydata) {
+function LineGraph({casesType, selectedCountry, selectedCountrySlug, getSlug}) {
   const [data, setData] = useState({});
 
   useEffect(() => {
-    const fetchData = async () => {
-      await fetch(`http://localhost:5000/api/${country}/stat`)
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          let chartData = buildChartData(data, casesType);
-          setData(chartData);
-        });
-    };
+    if (selectedCountry === "Global") {
+      //getCOuntryData für Global
+    } else {
+      const slug = getSlug(selectedCountry);
+      const getData = async () => {
+        await axios
+          .get(
+           // `${BASE_URL_API_2}/country/${slug}/status/${type}?from=${from}&to=${to}`
+           `${BASE_URL_API_2}/country/${slug}/status/${casesType}?from=2020-03-01T00:00:00Z&to=2020-04-01T00:00:00Z`
+          )
+          .then((res) => {
+              let chartData = buildChartData(getStatisticData(res.data))
+              setData(chartData);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      };
+      getData();
+    }
 
-    fetchData();
-  }, [casesType,country]);
+  },[casesType,selectedCountry])
 
   return (
     <div>
       {data?.length > 0 && (
-        <Line
+        <LineElement
           data={{
             datasets: [
               {
