@@ -6,6 +6,9 @@ import reportWebVitals from "./reportWebVitals";
 
 import { StyledEngineProvider } from "@mui/material/styles";
 
+import 'react-date-range/dist/styles.css'; // main style file
+import 'react-date-range/dist/theme/default.css'; // theme css file
+
 ReactDOM.render(
   <StyledEngineProvider injectFirst>
     <App />

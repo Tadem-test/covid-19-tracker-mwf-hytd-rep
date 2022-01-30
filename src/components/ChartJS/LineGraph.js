@@ -31,6 +31,7 @@ ChartJS.register(
 const BASE_URL_API_2 = "https://api.covid19api.com";
 
 function getStatisticData(countrydata) {
+  console.log(countrydata);
     const statData = {};
     for (var index = 0; index < countrydata.length; index++) {
       const date = countrydata[index].Date;
@@ -59,25 +60,29 @@ const buildChartDate = (data) => {
 };
 
 
-function LineGraph({casesType, selectedCountry, selectedCountrySlug, getSlug}) {
-  const [data, setData] = useState({});
+function LineGraph({startDate, endDate, selectedCountry, selectedCountrySlug, getSlug}) {
+  const [infectedData, setInfectedData] = useState({});
+  const [deathsData, setDeathsData] = useState({});
+  //const [start,setStart] = useState("2021-06-25T00:00:00Z");
+  //const [end,setEnd] = useState("2021-06-28T00:00:00Z");
+
   
-  const [date1, setDate1] = useState({});
+  const [date1, setDate1] = useState([0,1]);
 
 
   const lineChartData = {
- //   labels: date1,
-    labels: [10,11,12],
+    labels: date1,
+   //labels: [10,11,12],
     datasets: [
       {
-        data: data,
+        data: infectedData,
         label: "Infected",
         borderColor: "#3333ff",
         fill: true,
         lineTension: 0.5
       },
       {
-        data: [22, 33, 44,66,77,88,99,200],
+        data: deathsData,
         label: "Deaths",
         borderColor: "#ff3333",
         backgroundColor: "rgba(255, 0, 0, 0.5)",
@@ -92,17 +97,20 @@ function LineGraph({casesType, selectedCountry, selectedCountrySlug, getSlug}) {
       //getCOuntryData für Global
     } else {
       const slug = getSlug(selectedCountry);
- 
+      const start = `${startDate.getYear}-${startDate.getMonth}-${startDate.getDay}T00:00:00Z`;
+      const end = `${endDate.getYear}-${endDate.getMonth}-${endDate.getDay}T00:00:00Z`;
+      console.log(startDate)
+
       const getData = async () => {
         await axios
           .get(
            // `${BASE_URL_API_2}/country/${slug}/status/${type}?from=${from}&to=${to}`
-           `${BASE_URL_API_2}/country/${slug}/status/${casesType}?from=2020-03-01T00:00:00Z&to=2020-04-01T00:00:00Z`
+           `${BASE_URL_API_2}/country/${slug}/status/confirmed?from=${start}&to=${end}`
           )
           .then((res) => {
             let chartData = buildChartData(getStatisticData(res.data))
             let chartDate1 = buildChartDate(getStatisticData(res.data))
-              setData(chartData);
+              setInfectedData(chartData);
               setDate1(chartDate1);
           })
           .catch((err) => {
@@ -111,9 +119,25 @@ function LineGraph({casesType, selectedCountry, selectedCountrySlug, getSlug}) {
       };
       getData();
 
-    }
+      const getDeathsData = async () => {
+        await axios
+          .get(
+           // `${BASE_URL_API_2}/country/${slug}/status/${type}?from=${from}&to=${to}`
+           `${BASE_URL_API_2}/country/${slug}/status/deaths?from=${start}&to=${end}`
 
-  },[casesType,selectedCountry])
+          )
+          .then((res) => {
+            let chartData = buildChartData(getStatisticData(res.data))
+              setDeathsData(chartData);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      };
+      getDeathsData();
+
+    }
+  },[startDate,endDate,selectedCountry])
 
   return (
     <div>

@@ -12,6 +12,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import axios from "axios";
 import uuid from "react-uuid";
+import { DateRangePicker } from 'react-date-range';
 
 //import { Route, Switch, Redirect, withRouter } from "react-router-dom";
 
@@ -21,7 +22,6 @@ import Content from "../Content/Content";
 import InfoBox from "../InfoBox/InfoBox";
 import LineGraph from "../ChartJS/LineGraph";
 import { prettyPrintStat } from "../Util/Util";
-
 
 //APIs
 const BASE_URL_API_1 = "https://covid19.mathdro.id/api";
@@ -48,6 +48,10 @@ export default function Layout(props) {
   const [countryInfo, setCountryInfo] = useState({});
 
   const [casesType, setCasesType] = useState("confirmed");
+
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+
 
   useEffect(() => {
     const getCountrylistAPI1 = async () => {
@@ -92,7 +96,7 @@ export default function Layout(props) {
           console.log(res.data);
           setCountriesData(res.data);
           setCountryInfo(res.data.Global);
-          console.log(res.data.Global)
+          console.log(res.data.Global);
         })
         .catch((err) => {
           console.log(err);
@@ -106,8 +110,8 @@ export default function Layout(props) {
   }, [selectedCountry]);
 
   useEffect(() => {
-    console.log(casesType)
-  },[casesType])
+    console.log(casesType);
+  }, [casesType]);
 
   //manche länder haben keinen slug diese entfernen
   const getSlug = (countryname) => {
@@ -133,6 +137,18 @@ export default function Layout(props) {
     }
   };
 
+  const selectionRange = {
+    startDate: startDate,
+    endDate: endDate,
+    key: "selection",
+  };
+
+  const handleSelect = (ranges) => {
+   setStartDate(ranges.selection.startDate);
+   setEndDate(ranges.selection.endDate);
+   console.log(ranges.selection)
+  };
+
   const handleChangeCountry = (event) => {
     setSelectedCountry(event.target.value);
     /*getSelectedCountryData(
@@ -142,8 +158,8 @@ export default function Layout(props) {
       "2020-04-01T00:00:00Z"
     );*/
   };
-    return (
-      <>
+  return (
+    <>
       <div className="app__left">
         <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static">
@@ -185,14 +201,22 @@ export default function Layout(props) {
           </AppBar>
           <Toolbar />
         </Box>
-        <div className="app__stats">
-
-        </div>
+        <div className="app__stats"></div>
         <Card>
           <h3>Worldwide new {casesType}</h3>
-          <LineGraph casesType={casesType} selectedCountry={selectedCountry} selectedCountrySlug={selectedCountrySlug} getSlug={getSlug}/>
+          <DateRangePicker
+            ranges={[selectionRange]}
+            onChange={handleSelect}
+          />
+          <LineGraph
+            selectedCountry={selectedCountry}
+            selectedCountrySlug={selectedCountrySlug}
+            getSlug={getSlug}
+            startDate={startDate}
+            endDate={endDate}
+          />
         </Card>
-        </div>
-      </>
-    );
+      </div>
+    </>
+  );
 }
