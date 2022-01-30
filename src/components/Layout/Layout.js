@@ -22,7 +22,6 @@ import InfoBox from "../InfoBox/InfoBox";
 import LineGraph from "../ChartJS/LineGraph";
 import { prettyPrintStat } from "../Util/Util";
 
-import "./Layout.css";
 
 //APIs
 const BASE_URL_API_1 = "https://covid19.mathdro.id/api";

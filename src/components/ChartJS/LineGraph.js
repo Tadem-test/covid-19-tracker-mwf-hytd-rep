@@ -3,111 +3,74 @@ import numeral from "numeral";
 import axios from "axios";
 import moment from "moment";
 
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js'
-import { Chart } from 'react-chartjs-2'
+import { Line } from 'react-chartjs-2'
 
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend
-)
 
 const BASE_URL_API_2 = "https://api.covid19api.com";
 
 function getStatisticData(countrydata) {
     const statData = {};
     for (var index = 0; index < countrydata.length; index++) {
-        const date = countrydata[index].Date;
-        const utcStart = new moment(date, "YYYY-MM-DDTHH:mm:ssZ").utc();
-        const selectedDate = moment.unix(utcStart).format('MM/DD/YY');
-        //const splited = date.split('T');
-        //const selectedDate = splited[0];
+      const date = countrydata[index].Date;
+      const utcStart = new moment(date, "YYYY-MM-DDTHH:mm:ssZ").utc();
+      const selectedDate = utcStart.format('DD/MM/YY');
       const casesValue = countrydata[index].Cases;
       statData[selectedDate] = casesValue;
     }
-    console.log(statData);
     return statData;
   }
-
-const options = {
-  legend: {
-    display: false,
-  },
-  elements: {
-    point: {
-      radius: 0,
-    },
-  },
-  maintainAspectRatio: false,
-  tooltips: {
-    mode: "index",
-    intersect: false,
-    callbacks: {
-      label: function (tooltipItem, data) {
-        return numeral(tooltipItem.value).format("+0,0");
-      },
-    },
-  },
-  scales: {
-    xAxes: [
-      {
-        type: "time",
-        time: {
-          format: "MM/DD/YY",
-          tooltipFormat: "ll",
-        },
-      },
-    ],
-    yAxes: [
-      {
-        gridLines: {
-          display: false,
-        },
-        ticks: {
-          // Include a dollar sign in the ticks
-          callback: function (value, index, values) {
-            return numeral(value).format("0a");
-          },
-        },
-      },
-    ],
-  },
-};
 
 const buildChartData = (data) => {
   let chartData = [];
   for (let date in data) {
-      let newDataPoint = {
-        x: date,
-        y: data[date],
-      };
-      chartData.push(newDataPoint);
+      chartData.push(data[date]);
   }
-  console.log(chartData);
   return chartData;
 };
 
+const buildChartDate = (data) => {
+  let chartData = [];
+  for (let date in data) {
+      chartData.push(date);
+  }
+  return chartData;
+};
+
+
 function LineGraph({casesType, selectedCountry, selectedCountrySlug, getSlug}) {
   const [data, setData] = useState({});
+  
+  const [date1, setDate1] = useState({});
+
+
+  const lineChartData = {
+    labels: date1,
+  //  labels: [10,11,12],
+    datasets: [
+      {
+        data: data,
+        label: "Infected",
+        borderColor: "#3333ff",
+        fill: true,
+        lineTension: 0.5
+      },
+      {
+        data: [22, 33, 44,66,77,88,99,200],
+        label: "Deaths",
+        borderColor: "#ff3333",
+        backgroundColor: "rgba(255, 0, 0, 0.5)",
+        fill: true,
+        lineTension: 0.5
+      }
+    ]
+  }
 
   useEffect(() => {
     if (selectedCountry === "Global") {
       //getCOuntryData für Global
     } else {
       const slug = getSlug(selectedCountry);
+ 
       const getData = async () => {
         await axios
           .get(
@@ -115,34 +78,40 @@ function LineGraph({casesType, selectedCountry, selectedCountrySlug, getSlug}) {
            `${BASE_URL_API_2}/country/${slug}/status/${casesType}?from=2020-03-01T00:00:00Z&to=2020-04-01T00:00:00Z`
           )
           .then((res) => {
-              let chartData = buildChartData(getStatisticData(res.data))
+            let chartData = buildChartData(getStatisticData(res.data))
+            let chartDate1 = buildChartDate(getStatisticData(res.data))
               setData(chartData);
+              setDate1(chartDate1);
           })
           .catch((err) => {
             console.log(err);
           });
       };
       getData();
+
     }
 
   },[casesType,selectedCountry])
 
   return (
     <div>
-      {data?.length > 0 && (
-        <LineElement
-          data={{
-            datasets: [
-              {
-                backgroundColor: "#e8a0a5",
-                borderColor: "#CC1034",
-                data: data,
-              },
-            ],
-          }}
-          options={options}
-        />
-      )}
+       <Line
+      type="line"
+      width={160}
+      height={60}
+      options={{
+        title: {
+          display: true,
+          text: "COVID-19 Cases of Last 6 Months",
+          fontSize: 20
+        },
+        legend: {
+          display: true, //Is the legend shown?
+          position: "top" //Position of the legend.
+        }
+      }}
+      data={lineChartData}
+    />
     </div>
   );
 }
