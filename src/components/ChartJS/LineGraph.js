@@ -3,8 +3,30 @@ import numeral from "numeral";
 import axios from "axios";
 import moment from "moment";
 
-import { Line } from 'react-chartjs-2'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  
+} from 'chart.js'
 
+import { Chart, Line } from 'react-chartjs-2'
+
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+)
 
 const BASE_URL_API_2 = "https://api.covid19api.com";
 
@@ -44,8 +66,8 @@ function LineGraph({casesType, selectedCountry, selectedCountrySlug, getSlug}) {
 
 
   const lineChartData = {
-    labels: date1,
-  //  labels: [10,11,12],
+ //   labels: date1,
+    labels: [10,11,12],
     datasets: [
       {
         data: data,
