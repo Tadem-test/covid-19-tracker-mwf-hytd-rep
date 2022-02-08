@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import numeral from "numeral";
 import axios from "axios";
 import moment from "moment";
+import { format } from "date-fns";
 
 import {
   Chart as ChartJS,
@@ -60,12 +61,9 @@ const buildChartDate = (data) => {
 };
 
 
-function LineGraph({startDate, endDate, selectedCountry, selectedCountrySlug, getSlug}) {
+function LineGraph({dateRange, selectedCountry, selectedCountrySlug, getSlug}) {
   const [infectedData, setInfectedData] = useState({});
   const [deathsData, setDeathsData] = useState({});
-  //const [start,setStart] = useState("2021-06-25T00:00:00Z");
-  //const [end,setEnd] = useState("2021-06-28T00:00:00Z");
-
   
   const [date1, setDate1] = useState([0,1]);
 
@@ -97,15 +95,15 @@ function LineGraph({startDate, endDate, selectedCountry, selectedCountrySlug, ge
       //getCOuntryData für Global
     } else {
       const slug = getSlug(selectedCountry);
-      const start = `${startDate.getYear}-${startDate.getMonth}-${startDate.getDay}T00:00:00Z`;
-      const end = `${endDate.getYear}-${endDate.getMonth}-${endDate.getDay}T00:00:00Z`;
-      console.log(startDate)
+      const start = `${format(dateRange.start, "yyyy-MM-dd")}`;
+      const end = `${format(dateRange.end, "yyyy-MM-dd")}`;
+      console.log(start, end)
 
       const getData = async () => {
         await axios
           .get(
            // `${BASE_URL_API_2}/country/${slug}/status/${type}?from=${from}&to=${to}`
-           `${BASE_URL_API_2}/country/${slug}/status/confirmed?from=${start}&to=${end}`
+           `${BASE_URL_API_2}/country/${slug}/status/confirmed?from=${start}T00:00:00Z&to=${end}T00:00:00Z`
           )
           .then((res) => {
             let chartData = buildChartData(getStatisticData(res.data))
@@ -135,9 +133,9 @@ function LineGraph({startDate, endDate, selectedCountry, selectedCountrySlug, ge
           });
       };
       getDeathsData();
-
+      console.log("Start: "+dateRange.start+" End: "+dateRange.end);
     }
-  },[startDate,endDate,selectedCountry])
+  },[dateRange,selectedCountry])
 
   return (
     <div>

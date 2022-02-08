@@ -2,7 +2,12 @@ import React, { useEffect, useState } from "react";
 import {
   AppBar,
   Box,
+  Button,
   Card,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   IconButton,
   MenuItem,
   Select,
@@ -12,7 +17,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import axios from "axios";
 import uuid from "react-uuid";
-import { DateRangePicker } from 'react-date-range';
+import { DateRangePicker } from "react-date-range";
 
 //import { Route, Switch, Redirect, withRouter } from "react-router-dom";
 
@@ -20,7 +25,8 @@ import { DateRangePicker } from 'react-date-range';
 import Header from "../Header/Header";
 import Content from "../Content/Content";
 import InfoBox from "../InfoBox/InfoBox";
-import LineGraph from "../ChartJS/LineGraph";
+import LineGraphChartJS from "../ChartJS/LineGraph";
+import LineGraphD3JS from "../D3JS/LineGraph";
 import { prettyPrintStat } from "../Util/Util";
 
 //APIs
@@ -52,6 +58,12 @@ export default function Layout(props) {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
 
+  const [dateRange, setDateRange] = useState({
+    start: new Date(),
+    end: new Date(),
+  });
+
+  const [openDateRangeDialog, setOpenDateRangeDialog] = useState(false);
 
   useEffect(() => {
     const getCountrylistAPI1 = async () => {
@@ -144,9 +156,9 @@ export default function Layout(props) {
   };
 
   const handleSelect = (ranges) => {
-   setStartDate(ranges.selection.startDate);
-   setEndDate(ranges.selection.endDate);
-   console.log(ranges.selection)
+    setStartDate(ranges.selection.startDate);
+    setEndDate(ranges.selection.endDate);
+    console.log(ranges.selection);
   };
 
   const handleChangeCountry = (event) => {
@@ -158,6 +170,29 @@ export default function Layout(props) {
       "2020-04-01T00:00:00Z"
     );*/
   };
+
+  const handleClickOpen = () => {
+    setOpenDateRangeDialog(true);
+    setStartDate(new Date());
+    setEndDate(new Date());
+  };
+
+  const handleClose = () => {
+    setOpenDateRangeDialog(false);
+    setStartDate(new Date());
+    setEndDate(new Date());
+  };
+
+  const handleSaveAndSearch = () => {
+    setOpenDateRangeDialog(false);
+    setDateRange({ start: startDate, end: endDate });
+  };
+
+  const handleReset = () => {
+    setStartDate(new Date());
+    setEndDate(new Date());
+  };
+
   return (
     <>
       <div className="app__left">
@@ -204,16 +239,43 @@ export default function Layout(props) {
         <div className="app__stats"></div>
         <Card>
           <h3>Worldwide new {casesType}</h3>
-          <DateRangePicker
-            ranges={[selectionRange]}
-            onChange={handleSelect}
-          />
-          <LineGraph
+          <Button variant="outlined" onClick={handleClickOpen}>
+            Date Range
+          </Button>
+          <Dialog
+            open={openDateRangeDialog}
+            onClose={handleClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              {"Pick Date Range:"}
+            </DialogTitle>
+            <DialogContent>
+              <DateRangePicker
+                ranges={[selectionRange]}
+                onChange={handleSelect}
+                dateDisplayFormat="yyyy"
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>Cancel</Button>
+              <Button onClick={handleReset}>Reset</Button>
+              <Button onClick={handleSaveAndSearch} autoFocus>
+                Save and Search
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <LineGraphChartJS
             selectedCountry={selectedCountry}
             selectedCountrySlug={selectedCountrySlug}
             getSlug={getSlug}
-            startDate={startDate}
-            endDate={endDate}
+            dateRange={dateRange}
+          />
+          <LineGraphD3JS
+            selectedCountry={selectedCountry}
+            getSlug={getSlug}
+            dateRange={dateRange}
           />
         </Card>
       </div>
