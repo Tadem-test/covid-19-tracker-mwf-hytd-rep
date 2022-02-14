@@ -27,6 +27,7 @@ import Content from "../Content/Content";
 import InfoBox from "../InfoBox/InfoBox";
 import LineGraphChartJS from "../ChartJS/LineGraph";
 import LineGraphD3JS from "../D3JS/LineGraph";
+import LineGraphRechart from "../Rechart/Rechart"
 import { prettyPrintStat } from "../Util/Util";
 
 //APIs
@@ -272,11 +273,11 @@ export default function Layout(props) {
             getSlug={getSlug}
             dateRange={dateRange}
           />
-          <LineGraphD3JS
-            selectedCountry={selectedCountry}
+          <div>
+          <LineGraphRechart selectedCountry={selectedCountry}
             getSlug={getSlug}
-            dateRange={dateRange}
-          />
+            dateRange={dateRange}/>
+          </div>
         </Card>
       </div>
     </>

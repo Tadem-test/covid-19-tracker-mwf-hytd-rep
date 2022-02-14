@@ -13,10 +13,11 @@ import {
   Title,
   Tooltip,
   Legend,
+  BarElement,
   
 } from 'chart.js'
 
-import { Chart, Line } from 'react-chartjs-2'
+import { Chart, Line, Bar } from 'react-chartjs-2'
 
 
 ChartJS.register(
@@ -24,6 +25,7 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend
@@ -88,6 +90,25 @@ function LineGraph({dateRange, selectedCountry, selectedCountrySlug, getSlug}) {
         lineTension: 0.5
       }
     ]
+  }
+
+  const barChartData = {
+    labels: date1,
+    datasets: [
+      {
+        label: 'Infected',
+        backgroundColor: '#3333ff',
+        borderColor: 'rgba(0,0,0,1)',
+        borderWidth: 1,
+        data: infectedData
+      },
+        {
+          label: 'Deaths',
+          backgroundColor: '#ff3333',
+          borderColor: 'rgba(255, 0, 0, 0.5)',
+          borderWidth: 1,
+          data: deathsData
+        }]
   }
 
   useEffect(() => {
@@ -156,6 +177,20 @@ function LineGraph({dateRange, selectedCountry, selectedCountrySlug, getSlug}) {
       }}
       data={lineChartData}
     />
+    <Bar
+          data={barChartData}
+          options={{
+            title:{
+              display:true,
+              text:'Average Rainfall per month',
+              fontSize:20
+            },
+            legend:{
+              display:true,
+              position:'right'
+            }
+          }}
+        />
     </div>
   );
 }

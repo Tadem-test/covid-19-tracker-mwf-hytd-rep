@@ -9,11 +9,11 @@ const BASE_URL_API_2 = "https://api.covid19api.com";
 export default function LineGraph({dateRange, selectedCountry, getSlug}) {
     const [infectedData, setInfectedData] = useState({});
     const [deathsData, setDeathsData] = useState({});
-    const data = [
+    const [data,setData] = useState([]);
+    const defaultData = [
       { key: 'Group 1', values: [ { x: 'A', y: 23 }, { x: 'B', y: 8 } ] },
       { key: 'Group 2', values: [ { x: 'A', y: 15 }, { x: 'B', y: 37 } ] },
     ];
-    data.push({ key: 'Group 3', values: [ { x: 'A', y: 15 }, { x: 'B', y: 37 } ] })
 
     function getStatisticData(countrydata) {
         console.log(countrydata);
@@ -38,7 +38,7 @@ export default function LineGraph({dateRange, selectedCountry, getSlug}) {
 
     useEffect(() => {
         if (selectedCountry === "Global") {
-          //getCOuntryData für Global
+          setData(defaultData)
         } else {
           const slug = getSlug(selectedCountry);
           const start = `${format(dateRange.start, "yyyy-MM-dd")}`;
@@ -54,6 +54,7 @@ export default function LineGraph({dateRange, selectedCountry, getSlug}) {
               .then((res) => {
                 let chartData = buildChartData(getStatisticData(res.data),"confirmed")
                 setInfectedData(chartData);
+                data.push(chartData);
               })
               .catch((err) => {
                 console.log(err);
@@ -72,17 +73,19 @@ export default function LineGraph({dateRange, selectedCountry, getSlug}) {
                 let chartData = buildChartData(getStatisticData(res.data),"deaths")
                 console.log(chartData)
                 setDeathsData(chartData);
+                data.push(chartData);
               })
               .catch((err) => {
                 console.log(err);
               });
           };
           getDeathsData();
+
           console.log("Start: "+dateRange.start+" End: "+dateRange.end);
         }
       },[dateRange,selectedCountry])
 
     return(
-        <LineChart data={data} />
+        <LineChart data={data} >{console.log(data)}</LineChart>
     );
 };
