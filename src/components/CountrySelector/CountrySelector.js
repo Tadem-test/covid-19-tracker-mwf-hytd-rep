@@ -6,6 +6,7 @@ export default function CountrySelector({selectedCountry, handleChangeCountry, c
   return (
     <Box sx={{ minWidth: 120 }}>
       <Select
+        placeholder="Select a Country"
         id="country-selector"
         value={selectedCountry}
         label="Country"
