@@ -26,9 +26,6 @@ import Header from "../Header/Header";
 import Content from "../Content/Content";
 import InfoBox from "../InfoBox/InfoBox";
 import LineGraphChartJS from "../ChartJS/LineGraph";
-import LineGraphD3JS from "../D3JS/LineGraph";
-import LineGraphRechart from "../Rechart/Rechart"
-import { prettyPrintStat } from "../Util/Util";
 
 //APIs
 const BASE_URL_API_1 = "https://covid19.mathdro.id/api";
@@ -58,6 +55,8 @@ export default function Layout(props) {
 
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
+
+  const [selectedChart,setSelectedChart] = useState("line");
 
   const [dateRange, setDateRange] = useState({
     start: new Date(),
@@ -194,6 +193,10 @@ export default function Layout(props) {
     setEndDate(new Date());
   };
 
+  const handleSelectedChart = (e) => {
+    setSelectedChart(e.target.value);
+  }
+
   return (
     <>
       <div className="app__left">
@@ -267,17 +270,28 @@ export default function Layout(props) {
               </Button>
             </DialogActions>
           </Dialog>
+          <Select
+                  id="chart-selector"
+                  value={selectedChart}
+                  label="Chart"
+                  onChange={handleSelectedChart}
+                  variant="outlined"
+                  style={{ backgroundColor: "white" }}
+                >
+                  <MenuItem key={uuid()} value={"line"}>
+                    Line Chart
+                  </MenuItem>
+                  <MenuItem key={uuid()} value={"bar"}>
+                    Bar Chart
+                  </MenuItem>
+                </Select>
           <LineGraphChartJS
             selectedCountry={selectedCountry}
             selectedCountrySlug={selectedCountrySlug}
             getSlug={getSlug}
             dateRange={dateRange}
+            selectedChart={selectedChart}
           />
-          <div>
-          <LineGraphRechart selectedCountry={selectedCountry}
-            getSlug={getSlug}
-            dateRange={dateRange}/>
-          </div>
         </Card>
       </div>
     </>
