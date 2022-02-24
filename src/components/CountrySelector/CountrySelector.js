@@ -2,7 +2,11 @@ import React from "react";
 import { Box, MenuItem, Select } from "@mui/material";
 import uuid from "react-uuid";
 
-export default function CountrySelector({selectedCountry, handleChangeCountry, countries}) {
+export default function CountrySelector({
+  selectedCountry,
+  handleChangeCountry,
+  countries,
+}) {
   return (
     <Box sx={{ minWidth: 120 }}>
       <Select
@@ -11,7 +15,7 @@ export default function CountrySelector({selectedCountry, handleChangeCountry, c
         value={selectedCountry}
         label="Country"
         onChange={handleChangeCountry}
-        variant="outlined"
+        color="primary"
         style={{ backgroundColor: "white" }}
       >
         {countries.map((country) => {

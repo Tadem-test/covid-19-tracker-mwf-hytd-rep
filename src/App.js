@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card } from "@mui/material";
+import { Card, Grid } from "@mui/material";
 import axios from "axios";
 
 // components
@@ -9,38 +9,34 @@ import DateRangePicker from "./components/DateRangePicker/DateRangePicker";
 import ChartSelector from "./components/ChartSelector/ChartSelector";
 
 export default function App() {
-  //Country Liste
   const [countries, setCountries] = useState([]);
-
-  //Ausgewählte Country
-  const [selectedCountry, setSelectedCountry] = useState("Global");
-
-  //Slug für API abfrage
-  const [selectedCountrySlug, setSelectedCountrySlug] = useState("global");
-
-  //später durch eigene liste bit 2 param countryname und slug in countries state speichern
   const [countrylistAPI1, setCountrylistAPI1] = useState([]);
   const [countrylistAPI2, setCountrylistAPI2] = useState([]);
-
+  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedCountrySlug, setSelectedCountrySlug] = useState("");
   const [selectedChart, setSelectedChart] = useState("line");
-
-  const [dateRange, setDateRange] = useState({
+  /*const [dateRange, setDateRange] = useState({
     start: new Date(),
     end: new Date(),
-  });
+    
+  });*/
+  const defaultDate = new Date();
+  const [dateRange, setDateRange] = useState([
+    defaultDate.setMonth(defaultDate.getMonth() - 1),
+    new Date(),
+  ]);
 
   useEffect(() => {
     const getCountrylistAPI1 = async () => {
       await axios
         .get(`https://covid19.mathdro.id/api/countries`)
         .then((res) => {
-          console.log(res.data);
           setCountrylistAPI1(res.data.countries);
           const countryData = res.data.countries;
           const countriesArray = countryData.map(
             (countryObj) => countryObj.name
           );
-          setCountries(countries.concat(countriesArray));
+          setCountries(countriesArray);
         })
         .catch((err) => {
           console.log(err);
@@ -65,12 +61,18 @@ export default function App() {
 
   //manche länder haben keinen slug diese entfernen
   const getSlug = (countryname) => {
-    const findISO2 = countrylistAPI1.filter((obj) => obj.name === countryname);
-    const iso2 = findISO2[0].iso2;
-    const findSlug = countrylistAPI2.filter((obj) => obj.ISO2 === iso2);
-    const slug = findSlug[0].Slug;
-    setSelectedCountrySlug(slug);
-    return slug;
+    try {
+      const findISO2 = countrylistAPI1.filter(
+        (obj) => obj.name === countryname
+      );
+      const iso2 = findISO2[0].iso2;
+      const findSlug = countrylistAPI2.filter((obj) => obj.ISO2 === iso2);
+      const slug = findSlug[0].Slug;
+      setSelectedCountrySlug(slug);
+      return slug;
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleChangeCountry = (event) => {
@@ -84,31 +86,47 @@ export default function App() {
   const handleSelectedChart = (e) => {
     setSelectedChart(e.target.value);
   };
+
   return (
     <>
-      <div className="app__left">
-        <Header
-          selectedCountry={selectedCountry}
-          handleChangeCountry={handleChangeCountry}
-          countries={countries}
-        />
-        <div className="app__stats"></div>
-        <Card>
-          <h3>COVID-19 Chart</h3>
-          <DateRangePicker updateDateRange={updateDateRange} />
+      <Header
+        selectedCountry={selectedCountry}
+        handleChangeCountry={handleChangeCountry}
+        countries={countries}
+      />
+      <Grid container spacing={2}>
+        <Grid item xs={2}></Grid>
+        <Grid item xs={7}>
+          <DateRangePicker
+            updateDateRange={updateDateRange}
+            dateRange={dateRange}
+          />
+        </Grid>
+        <Grid item xs={1}>
           <ChartSelector
             selectedChart={selectedChart}
             handleSelectedChart={handleSelectedChart}
           />
-          <ChartJS
-            selectedCountry={selectedCountry}
-            selectedCountrySlug={selectedCountrySlug}
-            getSlug={getSlug}
-            dateRange={dateRange}
-            selectedChart={selectedChart}
-          />
-        </Card>
-      </div>
+        </Grid>
+        <Grid item xs={2}></Grid>
+        <Grid item xs={2}></Grid>
+        <Grid item xs={8}>
+          <Card variant="outlined">
+            <ChartJS
+              selectedCountry={selectedCountry}
+              selectedCountrySlug={selectedCountrySlug}
+              getSlug={getSlug}
+              dateRange={dateRange}
+              selectedChart={selectedChart}
+            />
+          </Card>
+        </Grid>
+        <Grid item xs={2}></Grid>
+      </Grid>
     </>
   );
 }
+
+/*
+
+*/

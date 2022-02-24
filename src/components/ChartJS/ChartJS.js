@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import numeral from "numeral";
 import axios from "axios";
 import moment from "moment";
 import { format } from "date-fns";
@@ -16,7 +15,7 @@ import {
   BarElement,
 } from "chart.js";
 
-import { Chart, Line, Bar } from "react-chartjs-2";
+import { Line, Bar } from "react-chartjs-2";
 
 ChartJS.register(
   CategoryScale,
@@ -69,7 +68,7 @@ function LineGraph({
 }) {
   const [infectedData, setInfectedData] = useState({});
   const [deathsData, setDeathsData] = useState({});
-
+  console.log(dateRange);
   const [date1, setDate1] = useState([0, 1]);
 
   const lineChartData = {
@@ -119,8 +118,8 @@ function LineGraph({
       //getCOuntryData für Global
     } else {
       const slug = getSlug(selectedCountry);
-      const start = `${format(dateRange.start, "yyyy-MM-dd")}`;
-      const end = `${format(dateRange.end, "yyyy-MM-dd")}`;
+      const start = `${format(dateRange[0], "yyyy-MM-dd")}`;
+      const end = `${format(dateRange[1], "yyyy-MM-dd")}`;
       console.log(start, end);
 
       const getData = async () => {
@@ -179,6 +178,12 @@ function LineGraph({
             },
           }}
           data={lineChartData}
+          style={{
+            paddingLeft: 10,
+            paddingRight: 10,
+            paddingTop: 10,
+            paddingBottom: 10,
+          }}
         />
       )}
       {selectedChart === "bar" && (

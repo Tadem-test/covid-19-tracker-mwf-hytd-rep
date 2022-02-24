@@ -9,8 +9,8 @@ export default function ChartSelector({ selectedChart, handleSelectedChart }) {
       value={selectedChart}
       label="Chart"
       onChange={handleSelectedChart}
-      variant="outlined"
-      style={{ backgroundColor: "white" }}
+      variant="standard"
+      color="primary"
     >
       <MenuItem key={uuid()} value={"line"}>
         Line Chart
