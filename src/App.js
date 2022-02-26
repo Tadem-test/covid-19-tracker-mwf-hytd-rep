@@ -10,16 +10,9 @@ import ChartSelector from "./components/ChartSelector/ChartSelector";
 
 export default function App() {
   const [countries, setCountries] = useState([]);
-  const [countrylistAPI1, setCountrylistAPI1] = useState([]);
-  const [countrylistAPI2, setCountrylistAPI2] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState("");
-  const [selectedCountrySlug, setSelectedCountrySlug] = useState("");
   const [selectedChart, setSelectedChart] = useState("line");
-  /*const [dateRange, setDateRange] = useState({
-    start: new Date(),
-    end: new Date(),
-    
-  });*/
+
   const defaultDate = new Date();
   const [dateRange, setDateRange] = useState([
     defaultDate.setMonth(defaultDate.getMonth() - 1),
@@ -27,56 +20,25 @@ export default function App() {
   ]);
 
   useEffect(() => {
-    const getCountrylistAPI1 = async () => {
-      await axios
-        .get(`https://covid19.mathdro.id/api/countries`)
-        .then((res) => {
-          setCountrylistAPI1(res.data.countries);
-          const countryData = res.data.countries;
-          const countriesArray = countryData.map(
-            (countryObj) => countryObj.name
-          );
-          setCountries(countriesArray);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    };
-    getCountrylistAPI1();
-  }, []);
-
-  useEffect(() => {
-    const getCountrylistAPI2 = async () => {
+    const getCountrylist = async () => {
       await axios
         .get(`https://api.covid19api.com/countries`)
         .then((res) => {
-          setCountrylistAPI2(res.data);
+          const data = res.data;
+          const sortedCountryList = data.sort((a, b) =>
+            a.Country > b.Country ? 1 : b.Country > a.Country ? -1 : 0
+          );
+          setCountries(sortedCountryList);
         })
         .catch((err) => {
           console.log(err);
         });
     };
-    getCountrylistAPI2();
+    getCountrylist();
   }, []);
 
-  //manche länder haben keinen slug diese entfernen
-  const getSlug = (countryname) => {
-    try {
-      const findISO2 = countrylistAPI1.filter(
-        (obj) => obj.name === countryname
-      );
-      const iso2 = findISO2[0].iso2;
-      const findSlug = countrylistAPI2.filter((obj) => obj.ISO2 === iso2);
-      const slug = findSlug[0].Slug;
-      setSelectedCountrySlug(slug);
-      return slug;
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleChangeCountry = (event) => {
-    setSelectedCountry(event.target.value);
+  const changeCountry = (country) => {
+    setSelectedCountry(country);
   };
 
   const updateDateRange = (range) => {
@@ -91,7 +53,7 @@ export default function App() {
     <>
       <Header
         selectedCountry={selectedCountry}
-        handleChangeCountry={handleChangeCountry}
+        changeCountry={changeCountry}
         countries={countries}
       />
       <Grid container spacing={2}>
@@ -114,8 +76,6 @@ export default function App() {
           <Card variant="outlined">
             <ChartJS
               selectedCountry={selectedCountry}
-              selectedCountrySlug={selectedCountrySlug}
-              getSlug={getSlug}
               dateRange={dateRange}
               selectedChart={selectedChart}
             />
@@ -126,7 +86,3 @@ export default function App() {
     </>
   );
 }
-
-/*
-
-*/

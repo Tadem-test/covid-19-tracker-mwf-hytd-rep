@@ -1,6 +1,6 @@
 import React from "react";
 import TextField from "@mui/material/TextField";
-import DateRangePickerComponent from "@mui/lab/DateRangePicker";
+import DesktopDateRangePicker from "@mui/lab/DesktopDateRangePicker";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import Box from "@mui/material/Box";
@@ -8,7 +8,7 @@ import Box from "@mui/material/Box";
 export default function DateRangePicker({ updateDateRange, dateRange }) {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <DateRangePickerComponent
+      <DesktopDateRangePicker
         startText="Von"
         endText="Bis"
         value={dateRange}

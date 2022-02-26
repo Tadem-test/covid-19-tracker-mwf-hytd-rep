@@ -2,11 +2,7 @@ import React from "react";
 import { AppBar, Box, IconButton, Toolbar, Typography } from "@mui/material";
 import CountrySelector from "../CountrySelector/CountrySelector";
 
-export default function Header({
-  selectedCountry,
-  handleChangeCountry,
-  countries,
-}) {
+export default function Header({ selectedCountry, changeCountry, countries }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -22,7 +18,7 @@ export default function Header({
           <CountrySelector
             countries={countries}
             selectedCountry={selectedCountry}
-            handleChangeCountry={handleChangeCountry}
+            changeCountry={changeCountry}
           />
         </Toolbar>
       </AppBar>

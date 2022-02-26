@@ -59,13 +59,7 @@ const buildChartDate = (data) => {
   return chartData;
 };
 
-function LineGraph({
-  dateRange,
-  selectedCountry,
-  selectedCountrySlug,
-  getSlug,
-  selectedChart,
-}) {
+function LineGraph({ dateRange, selectedCountry, selectedChart }) {
   const [infectedData, setInfectedData] = useState({});
   const [deathsData, setDeathsData] = useState({});
   console.log(dateRange);
@@ -114,10 +108,9 @@ function LineGraph({
   };
 
   useEffect(() => {
-    if (selectedCountry === "Global") {
-      //getCOuntryData für Global
+    if (selectedCountry === "") {
     } else {
-      const slug = getSlug(selectedCountry);
+      const slug = selectedCountry.Slug;
       const start = `${format(dateRange[0], "yyyy-MM-dd")}`;
       const end = `${format(dateRange[1], "yyyy-MM-dd")}`;
       console.log(start, end);
@@ -125,7 +118,6 @@ function LineGraph({
       const getData = async () => {
         await axios
           .get(
-            // `${BASE_URL_API_2}/country/${slug}/status/${type}?from=${from}&to=${to}`
             `${BASE_URL_API_2}/country/${slug}/status/confirmed?from=${start}T00:00:00Z&to=${end}T00:00:00Z`
           )
           .then((res) => {
@@ -143,7 +135,6 @@ function LineGraph({
       const getDeathsData = async () => {
         await axios
           .get(
-            // `${BASE_URL_API_2}/country/${slug}/status/${type}?from=${from}&to=${to}`
             `${BASE_URL_API_2}/country/${slug}/status/deaths?from=${start}&to=${end}`
           )
           .then((res) => {

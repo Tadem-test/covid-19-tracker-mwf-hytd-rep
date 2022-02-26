@@ -4,7 +4,7 @@ import uuid from "react-uuid";
 
 export default function CountrySelector({
   selectedCountry,
-  handleChangeCountry,
+  changeCountry,
   countries,
 }) {
   return (
@@ -14,14 +14,16 @@ export default function CountrySelector({
         id="country-selector"
         value={selectedCountry}
         label="Country"
-        onChange={handleChangeCountry}
+        onChange={(e) => {
+          changeCountry(e.target.value);
+        }}
         color="primary"
         style={{ backgroundColor: "white" }}
       >
         {countries.map((country) => {
           return (
             <MenuItem key={uuid()} value={country}>
-              {country}
+              {country.Country}
             </MenuItem>
           );
         })}
