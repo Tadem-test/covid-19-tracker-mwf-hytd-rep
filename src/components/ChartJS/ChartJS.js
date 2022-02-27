@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import moment from "moment";
-import { format } from "date-fns";
+import { format, getDate } from "date-fns";
 
 import {
   Chart as ChartJS,
@@ -36,7 +36,7 @@ function getStatisticData(countrydata) {
   for (var index = 0; index < countrydata.length; index++) {
     const date = countrydata[index].Date;
     const utcStart = new moment(date, "YYYY-MM-DDTHH:mm:ssZ").utc();
-    const selectedDate = utcStart.format("DD/MM/YY");
+    const selectedDate = utcStart.format("MM/DD/YYYY");
     const casesValue = countrydata[index].Cases;
     statData[selectedDate] = casesValue;
   }
@@ -54,13 +54,46 @@ const buildChartData = (data) => {
 const buildChartDate = (data) => {
   let chartData = [];
   for (let date in data) {
-    chartData.push(date);
+     chartData.push(moment(date, "DD.MM.YYYY")._i);
+  }
+  return chartData;
+};
+
+const buildChartDataNew = (data) => {
+  let chartData = [];
+  let result;
+  let result3;
+
+  let result1;
+  for (let date in data) {
+       result = new Date(date);
+       result.setDate(result.getDate() + 1)
+
+       if (result.getMonth() < 10 && result.getDate() < 10 ) {
+        result3 = "0"+ (result.getMonth() + 1) +  "/0"+ result.getDate() + "/" + result.getFullYear();;
+        console.log(result3);
+      } else  if (result.getMonth() < 10 ) { 
+        result3 = "0"+ (result.getMonth() + 1) +  "/"+ result.getDate() + "/" + result.getFullYear();;
+        console.log(result3);
+    } else  if (result.getDate() < 10 ) { 
+      result3 = (result.getMonth() + 1) +  "/0"+ result.getDate() + "/" + result.getFullYear();;
+      console.log(result3);
+    }
+     else {
+      result3 = (result.getMonth() + 1) +  "/"+ result.getDate() + "/" + result.getFullYear();;
+        console.log(result3);
+
+      }
+   result1 = data[result3] - data[date];
+    chartData.push(result1);
   }
   return chartData;
 };
 
 function LineGraph({ dateRange, selectedCountry, selectedChart }) {
-  const [infectedData, setInfectedData] = useState({});
+  const [infectedDataTotal, setInfectedDataTotal] = useState({});
+  const [infectedDataDay, setInfectedDataDay] = useState({});
+  const [deathsDataTotal, setDeathsDataTotal] = useState({});
   const [deathsData, setDeathsData] = useState({});
   console.log(dateRange);
   const [date1, setDate1] = useState([0, 1]);
@@ -70,20 +103,38 @@ function LineGraph({ dateRange, selectedCountry, selectedChart }) {
     //labels: [10,11,12],
     datasets: [
       {
-        data: infectedData,
+        data: infectedDataTotal,
         label: "Infected",
         borderColor: "#3333ff",
         fill: true,
         lineTension: 0.5,
       },
       {
-        data: deathsData,
+        data: infectedDataDay,
+        label: "InfectedA",
+        borderColor: "#ff3333",
+        backgroundColor: "rgba(255, 0, 0, 255)",
+        fill: true,
+        lineTension: 0.5,
+      },
+      {
+        data: deathsDataTotal,
         label: "Deaths",
         borderColor: "#ff3333",
         backgroundColor: "rgba(255, 0, 0, 0.5)",
         fill: true,
         lineTension: 0.5,
       },
+      {
+        data: deathsData,
+        label: "DeathsA",
+        borderColor: "#ff3333",
+        backgroundColor: "rgba(255, 0, 0, 255)",
+        fill: true,
+        lineTension: 0.5,
+      },
+      
+
     ],
   };
 
@@ -95,15 +146,30 @@ function LineGraph({ dateRange, selectedCountry, selectedChart }) {
         backgroundColor: "#3333ff",
         borderColor: "rgba(0,0,0,1)",
         borderWidth: 1,
-        data: infectedData,
+        data: infectedDataTotal,
+      },
+      {
+        label: "InfectedA",
+        backgroundColor: "#ff3333",
+        borderColor: "rgba(0, 0, 0, 255)",
+        borderWidth: 1,
+        data: infectedDataDay,
       },
       {
         label: "Deaths",
         backgroundColor: "#ff3333",
         borderColor: "rgba(255, 0, 0, 0.5)",
         borderWidth: 1,
+        data: deathsDataTotal,
+      },
+      {
+        label: "Deaths",
+        backgroundColor: "#ff3333",
+        borderColor: "rgba(255, 0, 0, 255)",
+        borderWidth: 1,
         data: deathsData,
       },
+
     ],
   };
 
@@ -123,8 +189,10 @@ function LineGraph({ dateRange, selectedCountry, selectedChart }) {
           .then((res) => {
             let chartData = buildChartData(getStatisticData(res.data));
             let chartDate1 = buildChartDate(getStatisticData(res.data));
-            setInfectedData(chartData);
+            let chartDate2 = buildChartDataNew(getStatisticData(res.data));
+            setInfectedDataTotal(chartData);
             setDate1(chartDate1);
+            setInfectedDataDay(chartDate2);
           })
           .catch((err) => {
             console.log(err);
@@ -139,7 +207,9 @@ function LineGraph({ dateRange, selectedCountry, selectedChart }) {
           )
           .then((res) => {
             let chartData = buildChartData(getStatisticData(res.data));
-            setDeathsData(chartData);
+            let chartData2 = buildChartDataNew(getStatisticData(res.data));
+            setDeathsData(chartData2);
+            setDeathsDataTotal(chartData);
           })
           .catch((err) => {
             console.log(err);
