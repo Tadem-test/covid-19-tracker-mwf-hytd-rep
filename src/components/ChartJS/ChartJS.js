@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import moment from "moment";
-import { format, getDate } from "date-fns";
+import { format } from "date-fns";
 
 import {
   Chart as ChartJS,
@@ -31,7 +31,6 @@ ChartJS.register(
 const BASE_URL_API_2 = "https://api.covid19api.com";
 
 function getStatisticData(countrydata) {
-  console.log(countrydata);
   const statData = {};
   for (var index = 0; index < countrydata.length; index++) {
     const date = countrydata[index].Date;
@@ -54,132 +53,109 @@ const buildChartData = (data) => {
 const buildChartDate = (data) => {
   let chartData = [];
   for (let date in data) {
-     chartData.push(moment(date, "DD.MM.YYYY")._i);
+    chartData.push(date);
   }
   return chartData;
 };
 
 const buildChartDataNew = (data) => {
-  let chartData = [];
-  let result;
-  let result3;
+  let results = [];
+  let attr = Object.keys(data);
 
-  let result1;
-  for (let date in data) {
-       result = new Date(date);
-       result.setDate(result.getDate() + 1)
+  results.push(0);
 
-       if (result.getMonth() < 10 && result.getDate() < 10 ) {
-        result3 = "0"+ (result.getMonth() + 1) +  "/0"+ result.getDate() + "/" + result.getFullYear();;
-        console.log(result3);
-      } else  if (result.getMonth() < 10 ) { 
-        result3 = "0"+ (result.getMonth() + 1) +  "/"+ result.getDate() + "/" + result.getFullYear();;
-        console.log(result3);
-    } else  if (result.getDate() < 10 ) { 
-      result3 = (result.getMonth() + 1) +  "/0"+ result.getDate() + "/" + result.getFullYear();;
-      console.log(result3);
-    }
-     else {
-      result3 = (result.getMonth() + 1) +  "/"+ result.getDate() + "/" + result.getFullYear();;
-        console.log(result3);
-
-      }
-   result1 = data[result3] - data[date];
-    chartData.push(result1);
+  for (let i = 1; i < attr.length; i++) {
+    const value = data[attr[i]] - data[attr[i - 1]];
+    results.push(value);
   }
-  return chartData;
+
+  return results;
 };
 
 function LineGraph({ dateRange, selectedCountry, selectedChart }) {
-  const [infectedDataTotal, setInfectedDataTotal] = useState({});
-  const [infectedDataDay, setInfectedDataDay] = useState({});
-  const [deathsDataTotal, setDeathsDataTotal] = useState({});
-  const [deathsData, setDeathsData] = useState({});
-  console.log(dateRange);
-  const [date1, setDate1] = useState([0, 1]);
+  const [infectedTotal, setInfectedTotal] = useState({});
+  const [infectedDaily, setInfectedDaily] = useState({});
+  const [deathsTotal, setDeathsTotal] = useState({});
+  const [deathsDaily, setDeathsDaily] = useState({});
+  const [date, setDate] = useState([0, 1]);
 
   const lineChartData = {
-    labels: date1,
-    //labels: [10,11,12],
+    labels: date,
     datasets: [
       {
-        data: infectedDataTotal,
-        label: "Infected",
-        borderColor: "#3333ff",
+        data: infectedTotal,
+        label: "Infected Total",
+        borderColor: "#095763",
+        backgroundColor: "#188c9e",
         fill: true,
         lineTension: 0.5,
       },
       {
-        data: infectedDataDay,
-        label: "InfectedA",
-        borderColor: "#ff3333",
-        backgroundColor: "rgba(255, 0, 0, 255)",
+        data: infectedDaily,
+        label: "Infected Daily",
+        borderColor: "#6e602d",
+        backgroundColor: "#d1b44b",
         fill: true,
         lineTension: 0.5,
       },
       {
-        data: deathsDataTotal,
-        label: "Deaths",
-        borderColor: "#ff3333",
-        backgroundColor: "rgba(255, 0, 0, 0.5)",
+        data: deathsTotal,
+        label: "Deaths Total",
+        borderColor: "#544470",
+        backgroundColor: "#7b64a3",
         fill: true,
         lineTension: 0.5,
       },
       {
-        data: deathsData,
-        label: "DeathsA",
-        borderColor: "#ff3333",
-        backgroundColor: "rgba(255, 0, 0, 255)",
+        data: deathsDaily,
+        label: "Deaths Daily",
+        borderColor: "#378051",
+        backgroundColor: "#3bb367",
         fill: true,
         lineTension: 0.5,
       },
-      
-
     ],
   };
 
   const barChartData = {
-    labels: date1,
+    labels: date,
     datasets: [
       {
-        label: "Infected",
-        backgroundColor: "#3333ff",
-        borderColor: "rgba(0,0,0,1)",
+        label: "Infected Total",
+        borderColor: "#095763",
+        backgroundColor: "#188c9e",
         borderWidth: 1,
-        data: infectedDataTotal,
+        data: infectedTotal,
       },
       {
-        label: "InfectedA",
-        backgroundColor: "#ff3333",
-        borderColor: "rgba(0, 0, 0, 255)",
+        label: "Infected Daily",
+        borderColor: "#6e602d",
+        backgroundColor: "#d1b44b",
         borderWidth: 1,
-        data: infectedDataDay,
+        data: infectedDaily,
       },
       {
-        label: "Deaths",
-        backgroundColor: "#ff3333",
-        borderColor: "rgba(255, 0, 0, 0.5)",
+        label: "Deaths Total",
+        borderColor: "#544470",
+        backgroundColor: "#7b64a3",
         borderWidth: 1,
-        data: deathsDataTotal,
+        data: deathsTotal,
       },
       {
-        label: "Deaths",
-        backgroundColor: "#ff3333",
-        borderColor: "rgba(255, 0, 0, 255)",
+        label: "Deaths Daily",
+        borderColor: "#378051",
+        backgroundColor: "#3bb367",
         borderWidth: 1,
-        data: deathsData,
+        data: deathsDaily,
       },
-
     ],
   };
 
   useEffect(() => {
-    if (selectedCountry === "") {
-    } else {
+    if (selectedCountry != "") {
       const slug = selectedCountry.Slug;
       const start = `${format(dateRange[0], "yyyy-MM-dd")}`;
       const end = `${format(dateRange[1], "yyyy-MM-dd")}`;
-      console.log(start, end);
 
       const getData = async () => {
         await axios
@@ -187,12 +163,9 @@ function LineGraph({ dateRange, selectedCountry, selectedChart }) {
             `${BASE_URL_API_2}/country/${slug}/status/confirmed?from=${start}T00:00:00Z&to=${end}T00:00:00Z`
           )
           .then((res) => {
-            let chartData = buildChartData(getStatisticData(res.data));
-            let chartDate1 = buildChartDate(getStatisticData(res.data));
-            let chartDate2 = buildChartDataNew(getStatisticData(res.data));
-            setInfectedDataTotal(chartData);
-            setDate1(chartDate1);
-            setInfectedDataDay(chartDate2);
+            setInfectedTotal(buildChartData(getStatisticData(res.data)));
+            setInfectedDaily(buildChartDataNew(getStatisticData(res.data)));
+            setDate(buildChartDate(getStatisticData(res.data)));
           })
           .catch((err) => {
             console.log(err);
@@ -206,17 +179,14 @@ function LineGraph({ dateRange, selectedCountry, selectedChart }) {
             `${BASE_URL_API_2}/country/${slug}/status/deaths?from=${start}&to=${end}`
           )
           .then((res) => {
-            let chartData = buildChartData(getStatisticData(res.data));
-            let chartData2 = buildChartDataNew(getStatisticData(res.data));
-            setDeathsData(chartData2);
-            setDeathsDataTotal(chartData);
+            setDeathsTotal(buildChartData(getStatisticData(res.data)));
+            setDeathsDaily(buildChartDataNew(getStatisticData(res.data)));
           })
           .catch((err) => {
             console.log(err);
           });
       };
       getDeathsData();
-      console.log("Start: " + dateRange.start + " End: " + dateRange.end);
     }
   }, [dateRange, selectedCountry]);
 
@@ -230,12 +200,12 @@ function LineGraph({ dateRange, selectedCountry, selectedChart }) {
           options={{
             title: {
               display: true,
-              text: "COVID-19 Cases of Last 6 Months",
+              text: "COVID-19 Cases Line Chart",
               fontSize: 20,
             },
             legend: {
-              display: true, //Is the legend shown?
-              position: "top", //Position of the legend.
+              display: true,
+              position: "top",
             },
           }}
           data={lineChartData}
@@ -253,7 +223,7 @@ function LineGraph({ dateRange, selectedCountry, selectedChart }) {
           options={{
             title: {
               display: true,
-              text: "Average Rainfall per month",
+              text: "COVID-19 Cases Bar Chart",
               fontSize: 20,
             },
             legend: {
