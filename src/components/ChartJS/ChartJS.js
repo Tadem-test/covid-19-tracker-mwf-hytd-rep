@@ -28,8 +28,6 @@ ChartJS.register(
   Legend
 );
 
-const BASE_URL_API_2 = "https://api.covid19api.com";
-
 function getStatisticData(countrydata) {
   const statData = {};
   for (var index = 0; index < countrydata.length; index++) {
@@ -160,7 +158,7 @@ function LineGraph({ dateRange, selectedCountry, selectedChart }) {
       const getData = async () => {
         await axios
           .get(
-            `${BASE_URL_API_2}/country/${slug}/status/confirmed?from=${start}T00:00:00Z&to=${end}T00:00:00Z`
+            `https://api.covid19api.com/country/${slug}/status/confirmed?from=${start}T00:00:00Z&to=${end}T00:00:00Z`
           )
           .then((res) => {
             setInfectedTotal(buildChartData(getStatisticData(res.data)));
@@ -176,7 +174,7 @@ function LineGraph({ dateRange, selectedCountry, selectedChart }) {
       const getDeathsData = async () => {
         await axios
           .get(
-            `${BASE_URL_API_2}/country/${slug}/status/deaths?from=${start}&to=${end}`
+            `https://api.covid19api.com/country/${slug}/status/deaths?from=${start}T00:00:00Z&to=${end}T00:00:00Z`
           )
           .then((res) => {
             setDeathsTotal(buildChartData(getStatisticData(res.data)));
